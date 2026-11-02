@@ -1,0 +1,69 @@
+AI Lab 5: Adversarial Search, Minimax & Alpha-Beta | Mohammed Emad ALaini
+Python 3.11.6, standard library only
+
+========================================================================
+LAB 5 / Section 5.1 + Task 1  Minimax on the supplied tree
+========================================================================
+scores after padding: [3, 5, 2, 9, 0, 7, 0, 0] | treeDepth = 3
+The optimal value is: 5
+
+Bottom-up values (check for the hand trace):
+  depth 0 (MAX): [5]
+  depth 1 (MIN): [5, 0]
+  depth 2 (MAX): [5, 9, 7, 0]
+  depth 3 (leaves): [3, 5, 2, 9, 0, 7, 0, 0]
+minimax_counted -> value 5, leaves evaluated 8 of 8
+
+========================================================================
+LAB 5 / Section 5.2  Alpha-Beta on the supplied scores
+========================================================================
+scores = [3, 5, 2, 9, 3, 5, 2, 9] | depth = 3
+5
+
+========================================================================
+LAB 5 / Task 2  Leaf-evaluation counters on both algorithms
+========================================================================
+Section 5.1 tree (Minimax driver):
+  leaves: [3, 5, 2, 9, 0, 7, 0, 0]
+  Minimax   : value 5, leaves evaluated 8
+  Alpha-Beta: value 5, leaves evaluated 8 (evaluated leaf positions [0, 1, 2, 3, 4, 5, 6, 7])
+  values agree: True
+
+Section 5.2 tree (Alpha-Beta driver):
+  leaves: [3, 5, 2, 9, 3, 5, 2, 9]
+  Minimax   : value 5, leaves evaluated 8
+  Alpha-Beta: value 5, leaves evaluated 6 (evaluated leaf positions [0, 1, 2, 3, 4, 5])
+    cut: MIN node (depth 1, index 1): alpha=5 >= beta=5, right child pruned
+  values agree: True
+
+Supplied functions called directly (reference check: same root value):
+  5.1 tree: minimax = 5 | alphabeta = 5
+  5.2 tree: minimax = 5 | alphabeta = 5
+
+========================================================================
+LAB 5 / Task 3  Branch reordering: pruning changes, value does not
+========================================================================
+5.1 tree:
+  ordering | leaves | Minimax value | Alpha-Beta value | Minimax leaves | Alpha-Beta leaves | pruned
+  original order | [3, 5, 2, 9, 0, 7, 0, 0] | 5 | 5 | 8 | 8 | 0
+  swap root's two branches | [0, 7, 0, 0, 3, 5, 2, 9] | 5 | 5 | 8 | 8 | 0
+  swap children of left MIN node | [2, 9, 3, 5, 0, 7, 0, 0] | 5 | 5 | 8 | 8 | 0
+  swap children of right MIN node | [3, 5, 2, 9, 0, 0, 0, 7] | 5 | 5 | 8 | 6 | 2
+  best-first ordering (every node) | [5, 3, 9, 2, 0, 0, 7, 0] | 5 | 5 | 8 | 5 | 3
+  worst-first ordering (every node) | [0, 7, 0, 0, 2, 9, 3, 5] | 5 | 5 | 8 | 8 | 0
+
+5.2 tree:
+  ordering | leaves | Minimax value | Alpha-Beta value | Minimax leaves | Alpha-Beta leaves | pruned
+  original order | [3, 5, 2, 9, 3, 5, 2, 9] | 5 | 5 | 8 | 6 | 2
+  swap root's two branches | [3, 5, 2, 9, 3, 5, 2, 9] | 5 | 5 | 8 | 6 | 2
+  swap children of left MIN node | [2, 9, 3, 5, 3, 5, 2, 9] | 5 | 5 | 8 | 6 | 2
+  swap children of right MIN node | [3, 5, 2, 9, 2, 9, 3, 5] | 5 | 5 | 8 | 8 | 0
+  best-first ordering (every node) | [5, 3, 9, 2, 5, 3, 9, 2] | 5 | 5 | 8 | 5 | 3
+  worst-first ordering (every node) | [2, 9, 3, 5, 2, 9, 3, 5] | 5 | 5 | 8 | 8 | 0
+
+Edge case: the padding value of the Section 5.1 driver changes the answer
+  pad | leaves | Minimax value
+  0 | [3, 5, 2, 9, 0, 7, 0, 0] | 5
+  99 | [3, 5, 2, 9, 0, 7, 99, 99] | 7
+  Without padding, the right MIN node has only the branch (0, 7), worth max(0, 7) = 7,
+  so the real game value would be max(5, 7) = 7; the zero padding adds a fake MIN option worth 0.
